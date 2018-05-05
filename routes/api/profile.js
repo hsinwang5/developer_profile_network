@@ -190,7 +190,7 @@ router.post(
 
 //@route    POST api/profile/education
 //@desc     add education to user profile
-//@acces    Private
+//@access    Private
 router.post(
   "/education",
   passport.authenticate("jwt", { session: false }),
