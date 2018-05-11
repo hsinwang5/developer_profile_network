@@ -1,6 +1,12 @@
 import React, { Component } from "react";
-import axios from "axios";
-export default class Register extends Component {
+import PropTypes from "prop-types";
+import classnames from "classnames";
+//import redux component that connects react to redux
+import { connect } from "react-redux";
+import { registerUser } from "../../actions/authActions";
+//allows redirect within authActions, outside of component (using react Router)
+import { withRouter } from "react-router-dom";
+class Register extends Component {
   constructor() {
     super();
     this.state = {
@@ -13,6 +19,15 @@ export default class Register extends Component {
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  //can test for certain properties - we want to test if the props coming in
+  //have any errors
+  //if errors, the props get put into the state
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
   }
 
   onChange(e) {
@@ -28,14 +43,13 @@ export default class Register extends Component {
       password2: this.state.password2
     };
 
-    axios
-      .post("/api/users/register", newUser)
-      .then(res => console.log(res.data))
-      //err.response.data logs actual json error object
-      .catch(err => console.log(err.response.data));
+    //this.props.history works with withRouter import
+    this.props.registerUser(newUser, this.props.history);
   }
 
   render() {
+    const { errors } = this.state;
+
     return (
       <div className="register">
         <div className="container">
@@ -45,26 +59,41 @@ export default class Register extends Component {
               <p className="lead text-center">
                 Create your DevConnector account
               </p>
-              <form onSubmit={this.onSubmit}>
+              <form noValidate onSubmit={this.onSubmit}>
                 <div className="form-group">
                   <input
                     type="text"
-                    className="form-control form-control-lg"
+                    // form-controls will always be there as default
+                    //is-invalid will only show up if errors.name is there
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": errors.name
+                    })}
                     placeholder="Name"
                     name="name"
                     value={this.state.name}
                     onChange={this.onChange}
+                    //short circuit errors.name - if true, display div message
+                    //with bootstrap class
                   />
+                  {//short circuit to render conditionally
+                  errors.name && (
+                    <div className="invalid-feedback">{errors.name}</div>
+                  )}
                 </div>
                 <div className="form-group">
                   <input
                     type="email"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": errors.email
+                    })}
                     placeholder="Email Address"
                     name="email"
                     value={this.state.email}
                     onChange={this.onChange}
                   />
+                  {errors.email && (
+                    <div className="invalid-feedback">{errors.email}</div>
+                  )}
                   <small className="form-text text-muted">
                     This site uses Gravatar so if you want a profile image, use
                     a Gravatar email
@@ -73,22 +102,32 @@ export default class Register extends Component {
                 <div className="form-group">
                   <input
                     type="password"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": errors.password
+                    })}
                     placeholder="Password"
                     name="password"
                     value={this.state.password}
                     onChange={this.onChange}
                   />
+                  {errors.password && (
+                    <div className="invalid-feedback">{errors.password}</div>
+                  )}
                 </div>
                 <div className="form-group">
                   <input
                     type="password"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": errors.password2
+                    })}
                     placeholder="Confirm Password"
                     name="password2"
                     value={this.state.password2}
                     onChange={this.onChange}
                   />
+                  {errors.password2 && (
+                    <div className="invalid-feedback">{errors.password2}</div>
+                  )}
                 </div>
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
@@ -99,3 +138,19 @@ export default class Register extends Component {
     );
   }
 }
+
+Register.proptypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
+
+//state.auth = same key used in index file in reducers folder
+//access with this.props.auth.user
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+//export Register and connect with redux
+export default connect(mapStateToProps, { registerUser })(withRouter(Register));

@@ -18,7 +18,7 @@ const keys = require("../../config/keys");
 //@acces    Public
 router.get("/test", (req, res) => res.json({ msg: "Users Route Works" }));
 
-//@route    GET api/users/register
+//@route    POST api/users/register
 //@desc     register user
 //@acces    Public
 //user info sent via form by postman can be extracted with req.body - needs body-parser
