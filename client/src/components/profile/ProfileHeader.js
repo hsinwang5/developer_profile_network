@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { spawn } from "child_process";
 import isEmpty from "../../validation/is-empty";
 
 class ProfileHeader extends Component {
@@ -27,7 +26,9 @@ class ProfileHeader extends Component {
                 )}
               </p>
               <p>
-                {isEmpty(profile.location) ? null : <p>{profile.location}</p>}
+                {isEmpty(profile.location) ? null : (
+                  <span>{profile.location}</span>
+                )}
               </p>
               <p>
                 {isEmpty(profile.website) ? null : (
