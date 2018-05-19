@@ -1,13 +1,9 @@
 import React, { Component } from "react";
-import isEmpty from "../../validation/is-empty";
 import Moment from "react-moment";
 
 class ProfileCreds extends Component {
   render() {
     const { experience, education } = this.props;
-
-    console.log(experience[0].to);
-    console.log(education[0].to);
 
     const expItems = experience.map(exp => (
       <li key={exp._id} className="list-group-item">
